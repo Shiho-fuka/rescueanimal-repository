@@ -5,5 +5,6 @@ CREATE TABLE rescueanimal (
     malefemale VARCHAR(10) NOT NULL,
     age VARCHAR(50),
     medical VARCHAR(255),
+    image_url CLOB,
     owner_id INT NOT NULL
 );

@@ -14,6 +14,8 @@ public record AnimalRequest(
 
     String age,
 
-    String medical
+    String madical,
+
+    String image_url
 ) {
 }

@@ -7,6 +7,7 @@ public record AnimalResponse(
         String malefemale,
         String age,
         String medical,
+        String image_url,
         Integer owner_id
 ) {
 }

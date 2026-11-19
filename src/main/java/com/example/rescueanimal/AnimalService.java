@@ -28,7 +28,7 @@ public class AnimalService {
         return toResponse(animal);
     }
 
-    // 新規登録用（ownerIdは自動セット）
+    // 新規登録用（owner_idは自動セット）
     @Transactional
     public AnimalResponse createAnimal(AnimalRequest request) {
         // ※ログイン機能ができるまでは、利用者テーブルに存在する仮のID（例: 101）をセット
@@ -39,7 +39,8 @@ public class AnimalService {
                 request.region(),
                 request.malefemale(),
                 request.age(),
-                request.medical(),
+                request.madical(),
+                request.image_url(),
                 autoOwnerId
         );
 
@@ -47,7 +48,7 @@ public class AnimalService {
         return toResponse(savedAnimal);
     }
 
-    // 更新用（ownerIdは変更不可のためそのまま維持）
+    // 更新用（owner_idは変更不可のためそのまま維持）
     @Transactional
     public AnimalResponse updateAnimal(Integer id, AnimalRequest request) {
         AnimalEntity existingAnimal = animalRepository.findById(id)
@@ -59,7 +60,8 @@ public class AnimalService {
                 request.region(),
                 request.malefemale(),
                 request.age(),
-                request.medical()
+                request.madical(),
+                request.image_url()
         );
 
         AnimalEntity updatedAnimal = animalRepository.save(existingAnimal);
@@ -81,6 +83,7 @@ public class AnimalService {
                 animal.getMalefemale(),
                 animal.getAge(),
                 animal.getMedical(),
+                animal.getImage_url(),
                 animal.getOwner_id()
         );
     }

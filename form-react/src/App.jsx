@@ -1,8 +1,9 @@
-import { useEffect, useState } from 'react'
-import './App.css'
+import { useEffect, useState } from "react";
+import "./App.css";
 
-const ANIMALS_API_URL = 'http://localhost:8080/api/animals'
-const API_CONNECTION_ERROR_MESSAGE = 'Spring Boot APIに接続できません。バックエンドが起動しているか確認してください。'
+const ANIMALS_API_URL = "http://localhost:8080/api/animals";
+const API_CONNECTION_ERROR_MESSAGE =
+  "Spring Boot APIに接続できません。バックエンドが起動しているか確認してください。";
 
 // 1. ヘッダーコンポーネント
 function Header({ onNavigate }) {
@@ -12,8 +13,8 @@ function Header({ onNavigate }) {
         className="brand"
         href="#list"
         onClick={(e) => {
-          e.preventDefault()
-          onNavigate('list')
+          e.preventDefault();
+          onNavigate("list");
         }}
       >
         保護動物管理システム
@@ -22,38 +23,37 @@ function Header({ onNavigate }) {
         <a
           href="#list"
           onClick={(e) => {
-            e.preventDefault()
-            onNavigate('list')
+            e.preventDefault();
+            onNavigate("list");
           }}
         >
           保護動物一覧
         </a>
-        <button type="button" onClick={() => onNavigate('create')}>
+        <button type="button" onClick={() => onNavigate("create")}>
           新規登録
         </button>
       </nav>
     </header>
-  )
+  );
 }
 
-// 2. 一覧表示コンポーネント（検索機能・詳細ボタン付き）
+// 2. 一覧表示コンポーネント（サムネイル画像付き）
 function AnimalList({ animals, loading, onSelectAnimal }) {
-  const [searchKeyword, setSearchKeyword] = useState('')
+  const [searchKeyword, setSearchKeyword] = useState("");
 
   if (loading) {
-    return <p className="empty">保護動物データを読み込み中です...</p>
+    return <p className="empty">保護動物データを読み込み中です...</p>;
   }
 
   if (animals.length === 0) {
-    return <p className="empty">登録されている保護動物はまだありません。</p>
+    return <p className="empty">登録されている保護動物はまだありません。</p>;
   }
 
-  // 種類または地域で検索
   const filteredAnimals = animals.filter(
     (animal) =>
       animal.animal_type.includes(searchKeyword) ||
-      animal.region.includes(searchKeyword)
-  )
+      animal.region.includes(searchKeyword),
+  );
 
   return (
     <>
@@ -71,6 +71,7 @@ function AnimalList({ animals, loading, onSelectAnimal }) {
         <table>
           <thead>
             <tr>
+              <th>写真</th>
               <th>ID</th>
               <th>動物の種類</th>
               <th>保護地域</th>
@@ -82,13 +83,27 @@ function AnimalList({ animals, loading, onSelectAnimal }) {
           <tbody>
             {filteredAnimals.map((animal) => (
               <tr key={animal.animal_id}>
+                <td>
+                  {animal.image_url ? (
+                    <img
+                      src={animal.image_url}
+                      alt={animal.animal_type}
+                      className="animal-thumb"
+                    />
+                  ) : (
+                    <div className="no-image-thumb">写真なし</div>
+                  )}
+                </td>
                 <td>{animal.animal_id}</td>
                 <td>{animal.animal_type}</td>
                 <td>{animal.region}</td>
                 <td>{animal.malefemale}</td>
-                <td>{animal.age || '不明'}</td>
+                <td>{animal.age || "不明"}</td>
                 <td>
-                  <button type="button" onClick={() => onSelectAnimal(animal.animal_id)}>
+                  <button
+                    type="button"
+                    onClick={() => onSelectAnimal(animal.animal_id)}
+                  >
                     詳細を見る
                   </button>
                 </td>
@@ -98,13 +113,13 @@ function AnimalList({ animals, loading, onSelectAnimal }) {
         </table>
       )}
     </>
-  )
+  );
 }
 
-// 3. 詳細表示コンポーネント（編集・削除・一覧へ戻る）
+// 3. 詳細表示コンポーネント（大きな写真プレビュー付き）
 function AnimalDetail({ animal, onEdit, onDelete, onBack }) {
   if (!animal) {
-    return <p className="empty">データを読み込み中です...</p>
+    return <p className="empty">データを読み込み中です...</p>;
   }
 
   return (
@@ -112,6 +127,15 @@ function AnimalDetail({ animal, onEdit, onDelete, onBack }) {
       <h2>
         ID: {animal.animal_id} ／ {animal.animal_type}
       </h2>
+
+      {animal.image_url && (
+        <img
+          src={animal.image_url}
+          alt={animal.animal_type}
+          className="animal-detail-image"
+        />
+      )}
+
       <table>
         <tbody>
           <tr>
@@ -124,11 +148,11 @@ function AnimalDetail({ animal, onEdit, onDelete, onBack }) {
           </tr>
           <tr>
             <th>年齢</th>
-            <td>{animal.age || '未登録'}</td>
+            <td>{animal.age || "未登録"}</td>
           </tr>
           <tr>
             <th>医療・健康情報</th>
-            <td>{animal.medical || '特記事項なし'}</td>
+            <td>{animal.medical || "特記事項なし"}</td>
           </tr>
           <tr>
             <th>登録利用者ID</th>
@@ -137,7 +161,7 @@ function AnimalDetail({ animal, onEdit, onDelete, onBack }) {
         </tbody>
       </table>
 
-      <div className="actions" style={{ marginTop: '20px' }}>
+      <div className="actions" style={{ marginTop: "20px" }}>
         <button type="button" onClick={onEdit}>
           編集する
         </button>
@@ -153,44 +177,68 @@ function AnimalDetail({ animal, onEdit, onDelete, onBack }) {
         </button>
       </div>
     </div>
-  )
+  );
 }
 
-// 4. 新規登録・編集兼用フォームコンポーネント
+// 4. 新規登録・編集兼用フォームコンポーネント（画像ファイル選択・Base64変換付き）
 function AnimalForm({ initialData = null, onSubmit, onCancel }) {
-  const isEdit = Boolean(initialData)
+  const isEdit = Boolean(initialData);
   const [form, setForm] = useState({
-    animal_type: initialData?.animal_type ?? '犬',
-    region: initialData?.region ?? '',
-    malefemale: initialData?.malefemale ?? 'オス',
-    age: initialData?.age ?? '',
-    medical: initialData?.medical ?? '',
-  })
-  const [submitting, setSubmitting] = useState(false)
+    animal_type: initialData?.animal_type ?? "犬",
+    region: initialData?.region ?? "",
+    malefemale: initialData?.malefemale ?? "オス",
+    age: initialData?.age ?? "",
+    medical: initialData?.medical ?? "",
+    image_url: initialData?.image_url ?? "",
+  });
+  const [submitting, setSubmitting] = useState(false);
 
   const updateForm = (event) => {
-    const { name, value } = event.target
+    const { name, value } = event.target;
     setForm((current) => ({
       ...current,
       [name]: value,
-    }))
-  }
+    }));
+  };
+
+  // 画像ファイルが選択されたときにBase64文字列へ変換
+  const handleImageChange = (event) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      setForm((current) => ({
+        ...current,
+        image_url: reader.result,
+      }));
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleRemoveImage = () => {
+    setForm((current) => ({
+      ...current,
+      image_url: "",
+    }));
+  };
 
   const handleSubmit = async (event) => {
-    event.preventDefault()
-    setSubmitting(true)
+    event.preventDefault();
+    setSubmitting(true);
 
     const payload = {
       animal_type: form.animal_type,
       region: form.region,
       malefemale: form.malefemale,
-      age: form.age === '' ? null : form.age,
-      medical: form.medical === '' ? null : form.medical,
-    }
+      age: form.age === "" ? null : form.age,
+      medical: form.medical === "" ? null : form.medical,
+      image_url: form.image_url === "" ? null : form.image_url,
+    };
 
-    await onSubmit(payload)
-    setSubmitting(false)
-  }
+    await onSubmit(payload);
+    setSubmitting(false);
+  };
 
   return (
     <form className="form" onSubmit={handleSubmit}>
@@ -198,7 +246,12 @@ function AnimalForm({ initialData = null, onSubmit, onCancel }) {
         <span>
           動物の種類 <span className="required-badge">必須</span>
         </span>
-        <select name="animal_type" value={form.animal_type} onChange={updateForm} required>
+        <select
+          name="animal_type"
+          value={form.animal_type}
+          onChange={updateForm}
+          required
+        >
           <option value="犬">犬</option>
           <option value="猫">猫</option>
           <option value="その他">その他</option>
@@ -222,7 +275,12 @@ function AnimalForm({ initialData = null, onSubmit, onCancel }) {
         <span>
           性別 <span className="required-badge">必須</span>
         </span>
-        <select name="malefemale" value={form.malefemale} onChange={updateForm} required>
+        <select
+          name="malefemale"
+          value={form.malefemale}
+          onChange={updateForm}
+          required
+        >
           <option value="オス">オス</option>
           <option value="メス">メス</option>
           <option value="不明">不明</option>
@@ -235,7 +293,7 @@ function AnimalForm({ initialData = null, onSubmit, onCancel }) {
           name="age"
           value={form.age}
           onChange={updateForm}
-          placeholder="例：４週、生後3ヵ月、7歳（不明な場合は空欄）"
+          placeholder="例：3歳、生後半年（不明な場合は空欄）"
         />
       </label>
 
@@ -249,179 +307,199 @@ function AnimalForm({ initialData = null, onSubmit, onCancel }) {
         />
       </label>
 
+      <label>
+        保護動物の写真（任意）
+        <input type="file" accept="image/*" onChange={handleImageChange} />
+        {form.image_url && (
+          <div className="image-preview-box">
+            <img src={form.image_url} alt="プレビュー" />
+            <button
+              type="button"
+              className="button-secondary"
+              onClick={handleRemoveImage}
+            >
+              画像を削除する
+            </button>
+          </div>
+        )}
+      </label>
+
       <div className="actions">
         <button type="submit" disabled={submitting}>
-          {submitting ? '保存中...' : isEdit ? '更新する' : '登録する'}
+          {submitting ? "保存中..." : isEdit ? "更新する" : "登録する"}
         </button>
         <button type="button" className="button-secondary" onClick={onCancel}>
           キャンセル
         </button>
       </div>
     </form>
-  )
+  );
 }
 
 // 5. メインアプリケーション
 export default function App() {
-  const [view, setView] = useState('list')
-  const [animals, setAnimals] = useState([])
-  const [selectedAnimal, setSelectedAnimal] = useState(null)
-  const [loading, setLoading] = useState(true)
-  const [errorMessage, setErrorMessage] = useState('')
-  const [noticeMessage, setNoticeMessage] = useState('')
+  const [view, setView] = useState("list");
+  const [animals, setAnimals] = useState([]);
+  const [selectedAnimal, setSelectedAnimal] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [noticeMessage, setNoticeMessage] = useState("");
 
   const fetchAnimals = async () => {
-    setLoading(true)
-    setErrorMessage('')
+    setLoading(true);
+    setErrorMessage("");
     try {
-      const response = await fetch(ANIMALS_API_URL)
-      if (!response.ok) throw new Error()
-      const data = await response.json()
-      setAnimals(data)
+      const response = await fetch(ANIMALS_API_URL);
+      if (!response.ok) throw new Error();
+      const data = await response.json();
+      setAnimals(data);
     } catch {
-      setErrorMessage(API_CONNECTION_ERROR_MESSAGE)
+      setErrorMessage(API_CONNECTION_ERROR_MESSAGE);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   useEffect(() => {
-    fetchAnimals()
-  }, [])
+    fetchAnimals();
+  }, []);
 
   const handleSelectAnimal = async (id) => {
-    setErrorMessage('')
-    setNoticeMessage('')
+    setErrorMessage("");
+    setNoticeMessage("");
     try {
-      const response = await fetch(`${ANIMALS_API_URL}/${id}`)
-      if (!response.ok) throw new Error()
-      const data = await response.json()
-      setSelectedAnimal(data)
-      setView('detail')
+      const response = await fetch(`${ANIMALS_API_URL}/${id}`);
+      if (!response.ok) throw new Error();
+      const data = await response.json();
+      setSelectedAnimal(data);
+      setView("detail");
     } catch {
-      setErrorMessage('詳細データの取得に失敗しました。')
+      setErrorMessage("詳細データの取得に失敗しました。");
     }
-  }
+  };
 
   const handleCreateAnimal = async (payload) => {
-    setErrorMessage('')
+    setErrorMessage("");
     try {
       const response = await fetch(ANIMALS_API_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
-      })
-      if (!response.ok) throw new Error()
-      await fetchAnimals()
-      setNoticeMessage('新しい保護動物を登録しました。')
-      setView('list')
+      });
+      if (!response.ok) throw new Error();
+      await fetchAnimals();
+      setNoticeMessage("新しい保護動物を登録しました。");
+      setView("list");
     } catch {
-      setErrorMessage('登録に失敗しました。入力内容を確認してください。')
+      setErrorMessage("登録に失敗しました。入力内容を確認してください。");
     }
-  }
+  };
 
   const handleUpdateAnimal = async (payload) => {
-    setErrorMessage('')
+    setErrorMessage("");
     try {
-      const response = await fetch(`${ANIMALS_API_URL}/${selectedAnimal.animal_id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      })
-      if (!response.ok) throw new Error()
-      const updated = await response.json()
-      setSelectedAnimal(updated)
-      await fetchAnimals()
-      setNoticeMessage('保護動物情報を更新しました。')
-      setView('detail')
+      const response = await fetch(
+        `${ANIMALS_API_URL}/${selectedAnimal.animal_id}`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        },
+      );
+      if (!response.ok) throw new Error();
+      const updated = await response.json();
+      setSelectedAnimal(updated);
+      await fetchAnimals();
+      setNoticeMessage("保護動物情報を更新しました。");
+      setView("detail");
     } catch {
-      setErrorMessage('更新に失敗しました。入力内容を確認してください。')
+      setErrorMessage("更新に失敗しました。入力内容を確認してください。");
     }
-  }
+  };
 
   const handleDeleteAnimal = async (id) => {
-    if (!window.confirm(`ID: ${id} の保護動物データを削除してもよろしいですか？`)) return
-    setErrorMessage('')
+    if (
+      !window.confirm(`ID: ${id} の保護動物データを削除してもよろしいですか？`)
+    )
+      return;
+    setErrorMessage("");
     try {
-      const response = await fetch(`${ANIMALS_API_URL}/${id}`, { method: 'DELETE' })
-      if (!response.ok) throw new Error()
-      await fetchAnimals()
-      setNoticeMessage('保護動物データを削除しました。')
-      setView('list')
+      const response = await fetch(`${ANIMALS_API_URL}/${id}`, {
+        method: "DELETE",
+      });
+      if (!response.ok) throw new Error();
+      await fetchAnimals();
+      setNoticeMessage("保護動物データを削除しました。");
+      setView("list");
     } catch {
-      setErrorMessage('削除に失敗しました。')
+      setErrorMessage("削除に失敗しました。");
     }
-  }
+  };
 
   const navigateTo = (nextView) => {
-    setErrorMessage('')
-    setNoticeMessage('')
-    setView(nextView)
-  }
+    setErrorMessage("");
+    setNoticeMessage("");
+    setView(nextView);
+  };
 
   return (
     <>
       <Header onNavigate={navigateTo} />
-      <main className={`container ${view === 'create' || view === 'edit' ? 'narrow' : ''}`}>
+      <main
+        className={`container ${view === "create" || view === "edit" ? "narrow" : ""}`}
+      >
         <section className="page-head">
           <h1>
-            {view === 'list' && '保護動物一覧'}
-            {view === 'detail' && '保護動物詳細'}
-            {view === 'create' && '保護動物 新規登録'}
-            {view === 'edit' && '保護動物 編集'}
+            {view === "list" && "保護動物一覧"}
+            {view === "detail" && "保護動物詳細"}
+            {view === "create" && "保護動物 新規登録"}
+            {view === "edit" && "保護動物 編集"}
           </h1>
           <p>
-            {view === 'list' && '登録されている保護動物の一覧です。「詳細を見る」から編集・削除が行えます。'}
-            {view === 'detail' && '保護動物の詳細情報です。'}
-            {view === 'create' && '新しい保護動物の情報を入力して登録してください。'}
-            {view === 'edit' && '内容を修正して「更新する」を押してください。'}
+            {view === "list" &&
+              "登録されている保護動物の一覧です。「詳細を見る」から編集・削除が行えます。"}
+            {view === "detail" && "保護動物の詳細情報です。"}
+            {view === "create" &&
+              "新しい保護動物の情報を入力して登録してください。"}
+            {view === "edit" && "内容を修正して「更新する」を押してください。"}
           </p>
         </section>
 
         {errorMessage && <p className="alert">{errorMessage}</p>}
         {noticeMessage && <p className="notice">{noticeMessage}</p>}
 
-        {view === 'list' && (
-          <AnimalList animals={animals} loading={loading} onSelectAnimal={handleSelectAnimal} />
-        )}
-
-        {view === 'detail' && (
-          <AnimalDetail
-            animal={selectedAnimal}
-            onEdit={() => setView('edit')}
-            onDelete={handleDeleteAnimal}
-            onBack={() => navigateTo('list')}
+        {view === "list" && (
+          <AnimalList
+            animals={animals}
+            loading={loading}
+            onSelectAnimal={handleSelectAnimal}
           />
         )}
 
-        {view === 'create' && (
-          <AnimalForm onSubmit={handleCreateAnimal} onCancel={() => navigateTo('list')} />
+        {view === "detail" && (
+          <AnimalDetail
+            animal={selectedAnimal}
+            onEdit={() => setView("edit")}
+            onDelete={handleDeleteAnimal}
+            onBack={() => navigateTo("list")}
+          />
         )}
 
-        {view === 'edit' && (
+        {view === "create" && (
+          <AnimalForm
+            onSubmit={handleCreateAnimal}
+            onCancel={() => navigateTo("list")}
+          />
+        )}
+
+        {view === "edit" && (
           <AnimalForm
             initialData={selectedAnimal}
             onSubmit={handleUpdateAnimal}
-            onCancel={() => setView('detail')}
+            onCancel={() => setView("detail")}
           />
         )}
       </main>
     </>
-  )
+  );
 }
-
-// 一覧表示をカード形式にしたいとき
-//<section className="grid">
-//  {filteredAnimals.map((animal) => (
-//    <article className="animal-card" key={animal.animal_id}>
-//      <h2>{animal.animal_type}（{animal.malefemale}）</h2>
-//      <p>地域：{animal.region}</p>
-//      <p>年齢：{animal.age !== null ? `${animal.age}歳` : '不明'}</p>
-//      <div style={{ marginTop: '12px' }}>
-//        <button type="button" onClick={() => onSelectAnimal(animal.animal_id)}>
-//          詳細を見る
-//        </button>
-//      </div>
-//    </article>
-//  ))}
-//</section>
