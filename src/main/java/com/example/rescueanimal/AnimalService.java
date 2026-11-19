@@ -1,5 +1,7 @@
 package com.example.rescueanimal;
 
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
@@ -8,9 +10,11 @@ import java.util.List;
 public class AnimalService {
 
     private final AnimalRepository animalRepository;
+    private final OwnerRepository ownerRepository;
 
-    public AnimalService(AnimalRepository animalRepository) {
+    public AnimalService(AnimalRepository animalRepository, OwnerRepository ownerRepository) { // ★引数追加
         this.animalRepository = animalRepository;
+        this.ownerRepository = ownerRepository;
     }
 
     // 一覧表示用（全件取得）
@@ -28,11 +32,16 @@ public class AnimalService {
         return toResponse(animal);
     }
 
-    // 新規登録用（owner_idは自動セット）
+    // 新規登録用（ログイン中の利用者のowner_idを自動セット）
     @Transactional
     public AnimalResponse createAnimal(AnimalRequest request) {
-        // ※ログイン機能ができるまでは、利用者テーブルに存在する仮のID（例: 101）をセット
-        Integer autoOwnerId = 101;
+        // 現在ログインしているユーザー名を取得
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String username = auth.getName();
+
+        // 利用者テーブルから該当ユーザーのowner_idを取得
+        OwnerEntity owner = ownerRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("ログイン利用者が見つかりません: " + username));
 
         AnimalEntity animal = new AnimalEntity(
                 request.animal_type(),
@@ -41,7 +50,7 @@ public class AnimalService {
                 request.age(),
                 request.madical(),
                 request.image_url(),
-                autoOwnerId
+                owner.getOwner_id()
         );
 
         AnimalEntity savedAnimal = animalRepository.save(animal);
@@ -54,7 +63,6 @@ public class AnimalService {
         AnimalEntity existingAnimal = animalRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("指定されたIDの動物が見つかりません: " + id));
 
-        // AnimalEntityに追記したupdateメソッドで変更可能な項目だけ更新
         existingAnimal.update(
                 request.animal_type(),
                 request.region(),
@@ -74,7 +82,6 @@ public class AnimalService {
         animalRepository.deleteById(id);
     }
 
-    // Entity を Response DTO に変換する共通メソッド
     private AnimalResponse toResponse(AnimalEntity animal) {
         return new AnimalResponse(
                 animal.getAnimal_id(),
