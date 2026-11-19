@@ -1,5 +1,7 @@
-package com.example.rescueanimal;
+package com.example.rescueanimal.controller;
 
+import com.example.rescueanimal.repository.OwnerRepository;
+import com.example.rescueanimal.entity.OwnerEntity;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.CrossOrigin;

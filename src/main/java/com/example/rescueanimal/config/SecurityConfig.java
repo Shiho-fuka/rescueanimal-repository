@@ -1,5 +1,6 @@
-package com.example.rescueanimal;
+package com.example.rescueanimal.config;
 
+import com.example.rescueanimal.service.AppUserDetailsService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;

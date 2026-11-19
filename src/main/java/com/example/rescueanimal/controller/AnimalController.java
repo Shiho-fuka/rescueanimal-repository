@@ -1,5 +1,8 @@
-package com.example.rescueanimal;
+package com.example.rescueanimal.controller;
 
+import com.example.rescueanimal.dto.AnimalRequest;
+import com.example.rescueanimal.dto.AnimalResponse;
+import com.example.rescueanimal.service.AnimalService;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;

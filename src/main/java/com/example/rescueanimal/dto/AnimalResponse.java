@@ -1,4 +1,4 @@
-package com.example.rescueanimal;
+package com.example.rescueanimal.dto;
 
 public record AnimalResponse(
         Integer animal_id,

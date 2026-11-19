@@ -1,5 +1,11 @@
-package com.example.rescueanimal;
+package com.example.rescueanimal.service;
 
+import com.example.rescueanimal.dto.AnimalRequest;
+import com.example.rescueanimal.dto.AnimalResponse;
+import com.example.rescueanimal.entity.AnimalEntity;
+import com.example.rescueanimal.entity.OwnerEntity;
+import com.example.rescueanimal.repository.AnimalRepository;
+import com.example.rescueanimal.repository.OwnerRepository;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -48,7 +54,7 @@ public class AnimalService {
                 request.region(),
                 request.malefemale(),
                 request.age(),
-                request.madical(),
+                request.medical(),
                 request.image_url(),
                 owner.getOwner_id()
         );
@@ -68,7 +74,7 @@ public class AnimalService {
                 request.region(),
                 request.malefemale(),
                 request.age(),
-                request.madical(),
+                request.medical(),
                 request.image_url()
         );
 

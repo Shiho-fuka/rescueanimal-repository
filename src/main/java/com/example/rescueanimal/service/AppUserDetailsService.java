@@ -1,5 +1,7 @@
-package com.example.rescueanimal;
+package com.example.rescueanimal.service;
 
+import com.example.rescueanimal.entity.OwnerEntity;
+import com.example.rescueanimal.repository.OwnerRepository;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

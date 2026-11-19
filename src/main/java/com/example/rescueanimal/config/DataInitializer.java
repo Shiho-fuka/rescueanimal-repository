@@ -1,5 +1,7 @@
-package com.example.rescueanimal;
+package com.example.rescueanimal.config;
 
+import com.example.rescueanimal.entity.OwnerEntity;
+import com.example.rescueanimal.repository.OwnerRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

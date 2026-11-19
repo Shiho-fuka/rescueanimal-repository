@@ -1,4 +1,4 @@
-package com.example.rescueanimal;
+package com.example.rescueanimal.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

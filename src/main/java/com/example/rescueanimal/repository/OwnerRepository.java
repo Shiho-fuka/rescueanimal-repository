@@ -1,5 +1,6 @@
-package com.example.rescueanimal;
+package com.example.rescueanimal.repository;
 
+import com.example.rescueanimal.entity.OwnerEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.Optional;
 

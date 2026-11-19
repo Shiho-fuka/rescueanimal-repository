@@ -1,6 +1,5 @@
-package com.example.rescueanimal;
+package com.example.rescueanimal.dto;
 
-import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 
 public record AnimalRequest(
@@ -14,7 +13,7 @@ public record AnimalRequest(
 
     String age,
 
-    String madical,
+    String medical,
 
     String image_url
 ) {
