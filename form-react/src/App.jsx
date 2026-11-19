@@ -86,7 +86,7 @@ function AnimalList({ animals, loading, onSelectAnimal }) {
                 <td>{animal.animal_type}</td>
                 <td>{animal.region}</td>
                 <td>{animal.malefemale}</td>
-                <td>{animal.age !== null ? `${animal.age}歳` : '不明'}</td>
+                <td>{animal.age || '不明'}</td>
                 <td>
                   <button type="button" onClick={() => onSelectAnimal(animal.animal_id)}>
                     詳細を見る
@@ -124,7 +124,7 @@ function AnimalDetail({ animal, onEdit, onDelete, onBack }) {
           </tr>
           <tr>
             <th>年齢</th>
-            <td>{animal.age !== null ? `${animal.age}歳` : '未登録'}</td>
+            <td>{animal.age || '未登録'}</td>
           </tr>
           <tr>
             <th>医療・健康情報</th>
@@ -160,7 +160,7 @@ function AnimalDetail({ animal, onEdit, onDelete, onBack }) {
 function AnimalForm({ initialData = null, onSubmit, onCancel }) {
   const isEdit = Boolean(initialData)
   const [form, setForm] = useState({
-    animal_type: initialData?.animal_type ?? '',
+    animal_type: initialData?.animal_type ?? '犬',
     region: initialData?.region ?? '',
     malefemale: initialData?.malefemale ?? 'オス',
     age: initialData?.age ?? '',
@@ -180,12 +180,11 @@ function AnimalForm({ initialData = null, onSubmit, onCancel }) {
     event.preventDefault()
     setSubmitting(true)
 
-    // ageが空文字ならnull、入力されていれば数値に変換
     const payload = {
       animal_type: form.animal_type,
       region: form.region,
       malefemale: form.malefemale,
-      age: form.age === '' ? null : Number(form.age),
+      age: form.age === '' ? null : form.age,
       medical: form.medical === '' ? null : form.medical,
     }
 
@@ -199,13 +198,11 @@ function AnimalForm({ initialData = null, onSubmit, onCancel }) {
         <span>
           動物の種類 <span className="required-badge">必須</span>
         </span>
-        <input
-          name="animal_type"
-          value={form.animal_type}
-          onChange={updateForm}
-          placeholder="例：犬、猫"
-          required
-        />
+        <select name="animal_type" value={form.animal_type} onChange={updateForm} required>
+          <option value="犬">犬</option>
+          <option value="猫">猫</option>
+          <option value="その他">その他</option>
+        </select>
       </label>
 
       <label>
@@ -233,14 +230,12 @@ function AnimalForm({ initialData = null, onSubmit, onCancel }) {
       </label>
 
       <label>
-        年齢（任意・0歳以上）
+        年齢（任意）
         <input
           name="age"
-          type="number"
-          min="0"
           value={form.age}
           onChange={updateForm}
-          placeholder="不明な場合は空欄のままにしてください"
+          placeholder="例：４週、生後3ヵ月、7歳（不明な場合は空欄）"
         />
       </label>
 

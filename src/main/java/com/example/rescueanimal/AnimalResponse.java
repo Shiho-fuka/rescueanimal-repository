@@ -5,7 +5,7 @@ public record AnimalResponse(
         String animal_type,
         String region,
         String malefemale,
-        Integer age,
+        String age,
         String medical,
         Integer owner_id
 ) {

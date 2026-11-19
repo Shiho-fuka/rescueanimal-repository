@@ -12,8 +12,7 @@ public record AnimalRequest(
 
     String malefemale,
 
-    @Min(value = 0, message = "年齢は0以上で入力してください")
-    Integer age,
+    String age,
 
     String medical
 ) {

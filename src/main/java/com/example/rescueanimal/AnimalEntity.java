@@ -25,7 +25,7 @@ public class AnimalEntity {
 
     private String malefemale;
 
-    private Integer age;
+    private String age;
 
     private String medical;
 
@@ -37,7 +37,7 @@ public class AnimalEntity {
     }
 
     // 新規登録用のコンストラクタ
-    public AnimalEntity(String animal_type, String region, String malefemale, Integer age, String medical, Integer owner_id) {
+    public AnimalEntity(String animal_type, String region, String malefemale, String age, String medical, Integer owner_id) {
         this.animal_type = animal_type;
         this.region = region;
         this.malefemale = malefemale;
@@ -47,7 +47,7 @@ public class AnimalEntity {
     }
 
     // 更新用メソッド
-    public void update(String animal_type, String region, String malefemale, Integer age, String medical) {
+    public void update(String animal_type, String region, String malefemale, String age, String medical) {
         this.animal_type = animal_type;
         this.region = region;
         this.malefemale = malefemale;
