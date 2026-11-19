@@ -159,9 +159,11 @@ function LoginPage({ onLoginSuccess, onCancel }) {
   );
 }
 
-// 3. 一覧表示コンポーネント
+// 3. 一覧表示コンポーネント（カード形式＋ページネーション付き）
 function AnimalList({ animals, loading, onSelectAnimal }) {
   const [searchKeyword, setSearchKeyword] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const ITEMS_PER_PAGE = 6; // 1ページに表示するカード枚数（3枚などで試すこともできます）
 
   if (loading) {
     return <p className="empty">保護動物データを読み込み中です...</p>;
@@ -171,10 +173,29 @@ function AnimalList({ animals, loading, onSelectAnimal }) {
     return <p className="empty">登録されている保護動物はまだありません。</p>;
   }
 
+  // 種類または地域で絞り込み
   const filteredAnimals = animals.filter(
     (animal) =>
       animal.animal_type.includes(searchKeyword) ||
       animal.region.includes(searchKeyword),
+  );
+
+  // 検索ワードが変わったら1ページ目に戻す
+  const handleSearchChange = (event) => {
+    setSearchKeyword(event.target.value);
+    setCurrentPage(1);
+  };
+
+  // 総ページ数の計算（最低1ページ）
+  const totalPages = Math.max(
+    1,
+    Math.ceil(filteredAnimals.length / ITEMS_PER_PAGE),
+  );
+  // 現在のページに表示するデータだけを切り出す
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const currentAnimals = filteredAnimals.slice(
+    startIndex,
+    startIndex + ITEMS_PER_PAGE,
   );
 
   return (
@@ -182,7 +203,7 @@ function AnimalList({ animals, loading, onSelectAnimal }) {
       <div className="animal-search">
         <input
           value={searchKeyword}
-          onChange={(event) => setSearchKeyword(event.target.value)}
+          onChange={handleSearchChange}
           placeholder="動物の種類・地域で検索（例：犬、松山市）"
         />
       </div>
@@ -190,49 +211,65 @@ function AnimalList({ animals, loading, onSelectAnimal }) {
       {filteredAnimals.length === 0 ? (
         <p className="empty">検索条件に一致する保護動物はありません。</p>
       ) : (
-        <table>
-          <thead>
-            <tr>
-              <th>写真</th>
-              <th>ID</th>
-              <th>動物の種類</th>
-              <th>保護地域</th>
-              <th>性別</th>
-              <th>年齢</th>
-              <th>操作</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredAnimals.map((animal) => (
-              <tr key={animal.animal_id}>
-                <td>
-                  {animal.image_url ? (
-                    <img
-                      src={animal.image_url}
-                      alt={animal.animal_type}
-                      className="animal-thumb"
-                    />
-                  ) : (
-                    <div className="no-image-thumb">写真なし</div>
-                  )}
-                </td>
-                <td>{animal.animal_id}</td>
-                <td>{animal.animal_type}</td>
-                <td>{animal.region}</td>
-                <td>{animal.malefemale}</td>
-                <td>{animal.age || "不明"}</td>
-                <td>
+        <>
+          <section className="grid">
+            {currentAnimals.map((animal) => (
+              <article className="animal-card" key={animal.animal_id}>
+                {animal.image_url ? (
+                  <img
+                    src={animal.image_url}
+                    alt={animal.animal_type}
+                    className="animal-card-image"
+                  />
+                ) : (
+                  <div className="animal-card-no-image">写真なし</div>
+                )}
+
+                <h2>
+                  {animal.animal_type}（{animal.malefemale}）
+                </h2>
+                <p className="animal-card-meta">保護地域：{animal.region}</p>
+                <p className="animal-card-meta">年齢：{animal.age || "不明"}</p>
+
+                <div style={{ marginTop: "14px" }}>
                   <button
                     type="button"
+                    style={{ width: "100%" }}
                     onClick={() => onSelectAnimal(animal.animal_id)}
                   >
                     詳細を見る
                   </button>
-                </td>
-              </tr>
+                </div>
+              </article>
             ))}
-          </tbody>
-        </table>
+          </section>
+
+          {/* ページが2ページ以上ある場合、または件数確認用にページ切り替えを表示 */}
+          {totalPages > 1 && (
+            <div className="pagination">
+              <button
+                type="button"
+                disabled={currentPage === 1}
+                onClick={() => setCurrentPage((prev) => prev - 1)}
+              >
+                ← 前のページ
+              </button>
+
+              <span className="pagination-info">
+                {currentPage} / {totalPages} ページ（全 {filteredAnimals.length}{" "}
+                件）
+              </span>
+
+              <button
+                type="button"
+                disabled={currentPage === totalPages}
+                onClick={() => setCurrentPage((prev) => prev + 1)}
+              >
+                次のページ →
+              </button>
+            </div>
+          )}
+        </>
       )}
     </>
   );
@@ -606,10 +643,15 @@ export default function App() {
 
   // 削除
   const handleDeleteAnimal = async (id) => {
-    if (
-      !window.confirm(`ID: ${id} の保護動物データを削除してもよろしいですか？`)
-    )
-      return;
+    const isOtherOwner =
+      selectedAnimal &&
+      Number(selectedAnimal.owner_id) !== Number(auth.owner_id);
+
+    const confirmMessage = isOtherOwner
+      ? `⚠️ この動物は別の利用者（ID: ${selectedAnimal.owner_id})が登録しています。\n本当に削除してもよろしいですか？`
+      : `ID: ${id} の保護動物データを削除してもよろしいですか？`;
+
+    if (!window.confirm(confirmMessage)) return;
     setErrorMessage("");
     try {
       const response = await fetch(`${ANIMALS_API_URL}/${id}`, {
@@ -681,7 +723,15 @@ export default function App() {
           <AnimalDetail
             animal={selectedAnimal}
             isAuthenticated={auth.authenticated}
-            onEdit={() => setView("edit")}
+            onEdit={() => {
+              if (Number(selectedAnimal.owner_id) !== Number(auth.owner_id)) {
+                const ok = window.confirm(
+                  `⚠️ この動物は別の利用者（ID: ${selectedAnimal.owner_id}）が登録しています。\n本当に編集しますか？`,
+                );
+                if (!ok) return;
+              }
+              setView("edit");
+            }}
             onDelete={handleDeleteAnimal}
             onBack={() => navigateTo("list")}
           />
