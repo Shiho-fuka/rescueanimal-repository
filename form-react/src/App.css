@@ -1,11 +1,11 @@
-* {
+@import url("https://googleapis.com") * {
   box-sizing: border-box;
 }
 
 body {
   margin: 0;
-  color: #4a2739;
-  background: #fff4f8;
+  color: #3d291c;
+  background: #fbf7f2;
   font-family:
     system-ui,
     -apple-system,
@@ -27,18 +27,19 @@ a {
   min-height: 64px;
   padding: 0 32px;
   background: #ffffff;
-  border-bottom: 1px solid #f4bfd3;
-  box-shadow: 0 8px 24px rgba(194, 45, 112, 0.08);
+  border-bottom: 2px solid #ebd5c1;
+  box-shadow: 0 6px 20px rgba(217, 107, 39, 0.08);
 }
 
 .brand {
-  color: #b52665;
+  color: #d96b27;
   font-weight: 700;
-  font-size: 18px;
+  font-size: 15px;
+  letter-spacing: 0.02em;
 }
 
 .login-status {
-  color: #8a526c;
+  color: #785a46;
   font-size: 14px;
   font-weight: 700;
   white-space: nowrap;
@@ -49,6 +50,10 @@ a {
   display: flex;
   align-items: center;
   gap: 16px;
+}
+
+.nav a:hover {
+  color: #d96b27;
 }
 
 .container {
@@ -66,12 +71,16 @@ a {
 
 .page-head h1 {
   margin: 0 0 8px;
-  font-size: 28px;
+  font-family:
+    "Zen Maru Gothic", "Hiragino Maru Gothic ProN", "Yu Gothic", sans-serif;
+  font-size: 30px;
+  letter-spacing: 0.04em;
+  color: #9e4510;
 }
 
 .page-head p {
   margin: 0;
-  color: #8f6a7d;
+  color: #7d6250;
 }
 
 .row {
@@ -83,25 +92,27 @@ a {
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 16px;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 20px;
 }
 
 .animal-search {
-  margin-bottom: 16px;
+  margin-bottom: 20px;
 }
 
 .animal-search input {
-  max-width: 360px;
+  max-width: 380px;
+  margin: 0 auto;
+  background: #ffffff;
 }
 
 .animal-card,
 .form,
 table {
   background: #ffffff;
-  border: 1px solid #f4bfd3;
-  border-radius: 8px;
-  box-shadow: 0 12px 30px rgba(194, 45, 112, 0.08);
+  border: 1px solid #ebd5c1;
+  border-radius: 10px;
+  box-shadow: 0 10px 26px rgba(217, 107, 39, 0.07);
 }
 
 .animal-card {
@@ -109,8 +120,9 @@ table {
 }
 
 .animal-card h2 {
-  margin: 0 0 12px;
+  margin: 0 0 10px;
   font-size: 20px;
+  color: #9e4510;
 }
 
 .animal-card p {
@@ -127,27 +139,30 @@ label {
   display: grid;
   gap: 6px;
   font-weight: 600;
+  color: #4a3324;
 }
 
 .required-badge {
   display: inline-block;
   margin-left: 6px;
-  padding: 2px 6px;
+  padding: 2px 7px;
   font-size: 11px;
   color: #ffffff;
-  background: #db3f82;
+  background: #d96b27;
   border-radius: 4px;
 }
 
 input,
 select,
 textarea {
+  display: block;
   width: 100%;
+  max-width: 465px;
   min-height: 40px;
-  padding: 8px 10px;
-  border: 1px solid #e9a6c4;
+  padding: 8px 12px;
+  border: 1px solid #dfb998;
   border-radius: 6px;
-  background: #fffcff;
+  background: #fffdfb;
   font: inherit;
   color: inherit;
 }
@@ -160,32 +175,39 @@ textarea {
 input:focus,
 select:focus,
 textarea:focus {
-  border-color: #db3f82;
-  outline: 3px solid #ffd4e6;
+  border-color: #d96b27;
+  outline: 3px solid #fae2cf;
+  background: #ffffff;
 }
 
 .password-field {
-  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  max-width: 490px;
 }
 
 .password-field input {
-  padding-right: 86px;
+  flex: 1;
+  min-width: 0;
+  width: auto;
+  padding-right: 12px;
 }
 
 .password-toggle {
-  position: absolute;
-  top: 50%;
-  right: 6px;
-  transform: translateY(-50%);
-  min-height: 28px;
+  position: static;
+  transform: none;
+  flex-shrink: 0;
+  min-height: 40px;
   min-width: 68px;
-  padding: 4px 8px;
-  background: #8a526c;
+  padding: 6px 12px;
+  background: #8c6d58;
   font-size: 13px;
 }
 
 .password-toggle:hover {
-  background: #6f3f55;
+  background: #6e5341;
 }
 
 button,
@@ -194,35 +216,36 @@ button,
   align-items: center;
   justify-content: center;
   min-height: 38px;
-  padding: 8px 14px;
+  padding: 8px 16px;
   border: 0;
   border-radius: 6px;
   color: #ffffff;
-  background: #db3f82;
+  background: #d96b27;
   font: inherit;
   font-weight: 700;
   cursor: pointer;
+  transition: background-color 0.15s ease;
 }
 
 button:hover,
 .button:hover {
-  background: #c42d70;
+  background: #b85316;
 }
 
 .button-secondary {
-  background: #8a526c;
+  background: #8c6d58;
 }
 
 .button-secondary:hover {
-  background: #6f3f55;
+  background: #6e5341;
 }
 
 .button-danger {
-  background: #dc2626;
+  background: #d32f2f;
 }
 
 .button-danger:hover {
-  background: #b91c1c;
+  background: #b71c1c;
 }
 
 table {
@@ -234,38 +257,43 @@ table {
 th,
 td {
   padding: 12px 14px;
-  border-bottom: 1px solid #f8d8e5;
+  border-bottom: 1px solid #f2e4d8;
   text-align: left;
 }
 
 th {
-  background: #ffeaf2;
-  color: #8f1f52;
-}
-
-tbody tr:hover {
-  background: #fff9fb;
+  background: #faeee3;
+  color: #9e4510;
+  width: 30%;
 }
 
 .alert,
 .error {
-  color: #b42354;
+  padding: 10px 14px;
+  background: #ffebee;
+  border: 1px solid #ffcdd2;
+  border-radius: 6px;
+  color: #c62828;
   font-weight: 700;
 }
 
 .notice {
-  color: #b52665;
+  padding: 10px 14px;
+  background: #faeee3;
+  border: 1px solid #ebd5c1;
+  border-radius: 6px;
+  color: #b85316;
   font-weight: 700;
 }
 
 .form-help {
   margin: -8px 0 0;
-  color: #8f6a7d;
+  color: #7d6250;
   font-size: 14px;
 }
 
 .empty {
-  color: #8f6a7d;
+  color: #7d6250;
 }
 
 .actions {
@@ -276,7 +304,7 @@ tbody tr:hover {
 
 input::placeholder,
 textarea::placeholder {
-  color: #c0c0c0;
+  color: #bfa999;
 }
 
 .animal-thumb {
@@ -284,7 +312,7 @@ textarea::placeholder {
   height: 64px;
   object-fit: cover;
   border-radius: 6px;
-  border: 1px solid #f4bfd3;
+  border: 1px solid #ebd5c1;
   display: block;
 }
 
@@ -294,11 +322,11 @@ textarea::placeholder {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #ffeaf2;
-  color: #8f6a7d;
+  background: #faeee3;
+  color: #7d6250;
   font-size: 11px;
   border-radius: 6px;
-  border: 1px dashed #e9a6c4;
+  border: 1px dashed #dfb998;
 }
 
 .animal-detail-image {
@@ -306,8 +334,7 @@ textarea::placeholder {
   max-height: 320px;
   object-fit: contain;
   border-radius: 8px;
-  border: 1px solid #f4bfd3;
-  margin-bottom: 16px;
+  border: 1px solid #ebd5c1;
   display: block;
 }
 
@@ -324,7 +351,57 @@ textarea::placeholder {
   max-height: 240px;
   object-fit: cover;
   border-radius: 8px;
-  border: 1px solid #e9a6c4;
+  border: 1px solid #dfb998;
+}
+
+/* カード一覧用の追加スタイル */
+.animal-card-image {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid #ebd5c1;
+  margin-bottom: 12px;
+  display: block;
+}
+
+.animal-card-no-image {
+  width: 100%;
+  height: 180px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #faeee3;
+  color: #7d6250;
+  font-size: 14px;
+  border-radius: 8px;
+  border: 1px dashed #dfb998;
+  margin-bottom: 12px;
+}
+
+.animal-card-meta {
+  color: #785a46;
+  font-size: 14px;
+  margin: 4px 0;
+}
+
+/* ページネーション（前へ・次へ）用のスタイル */
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 28px;
+}
+
+.pagination button:disabled {
+  background: #e3cfc0;
+  cursor: not-allowed;
+}
+
+.pagination-info {
+  font-weight: 700;
+  color: #d96b27;
 }
 
 @media (max-width: 760px) {
@@ -340,54 +417,4 @@ textarea::placeholder {
   .topbar {
     padding: 18px 20px;
   }
-}
-
-/* カード一覧用の追加スタイル */
-.animal-card-image {
-  width: 100%;
-  height: 180px;
-  object-fit: cover;
-  border-radius: 6px;
-  border: 1px solid #f4bfd3;
-  margin-bottom: 12px;
-  display: block;
-}
-
-.animal-card-no-image {
-  width: 100%;
-  height: 180px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #ffeaf2;
-  color: #8f6a7d;
-  font-size: 14px;
-  border-radius: 6px;
-  border: 1px dashed #e9a6c4;
-  margin-bottom: 12px;
-}
-
-.animal-card-meta {
-  color: #8f6a7d;
-  font-size: 14px;
-  margin: 4px 0;
-}
-
-/* ページネーション（前へ・次へ）用のスタイル */
-.pagination {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 16px;
-  margin-top: 28px;
-}
-
-.pagination button:disabled {
-  background: #e5c6d4;
-  cursor: not-allowed;
-}
-
-.pagination-info {
-  font-weight: 700;
-  color: #8a526c;
 }

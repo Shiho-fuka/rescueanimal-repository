@@ -21,7 +21,7 @@ function Header({ auth, onNavigate, onLogout }) {
           onNavigate("list");
         }}
       >
-        保護動物管理システム
+        🐶「殺処分ゼロを目指すサイト」🐱
       </a>
       <nav className="nav">
         <a
@@ -47,7 +47,7 @@ function Header({ auth, onNavigate, onLogout }) {
               新規登録
             </button>
             <span className="login-status">
-              <span style={{ color: "#db3f82" }}>{auth.username}</span>（ID:{" "}
+              <span style={{ color: "#d96b27" }}>{auth.username}</span>（ID:{" "}
               {auth.owner_id}）でログイン中
             </span>
             <button
@@ -166,11 +166,11 @@ function AnimalList({ animals, loading, onSelectAnimal }) {
   const ITEMS_PER_PAGE = 6; // 1ページに表示するカード枚数
 
   if (loading) {
-    return <p className="empty">保護動物データを読み込み中です...</p>;
+    return <p className="empty">データを読み込み中です...</p>;
   }
 
   if (animals.length === 0) {
-    return <p className="empty">登録されている保護動物はまだありません。</p>;
+    return <p className="empty">登録されているデータはまだありません。</p>;
   }
 
   // 種類または地域で絞り込み
@@ -226,7 +226,13 @@ function AnimalList({ animals, loading, onSelectAnimal }) {
                 )}
 
                 <h2>
-                  {animal.animal_type}（{animal.malefemale}）
+                  {animal.animal_type} (
+                  {animal.malefemale === "オス"
+                    ? "♂"
+                    : animal.malefemale === "メス"
+                      ? "♀"
+                      : "性別不明"}
+                  )
                 </h2>
                 <p className="animal-card-meta">保護地域：{animal.region}</p>
                 <p className="animal-card-meta">年齢：{animal.age || "不明"}</p>
@@ -284,7 +290,13 @@ function AnimalDetail({ animal, isAuthenticated, onEdit, onDelete, onBack }) {
   return (
     <div className="animal-card">
       <h2>
-        ID: {animal.animal_id} ／ {animal.animal_type}
+        ID: {animal.animal_id} ／ {animal.animal_type} (
+        {animal.malefemale === "オス"
+          ? "♂"
+          : animal.malefemale === "メス"
+            ? "♀"
+            : "性別不明"}
+        )
       </h2>
 
       <table>
@@ -316,7 +328,7 @@ function AnimalDetail({ animal, isAuthenticated, onEdit, onDelete, onBack }) {
             <td>{animal.age || "未登録"}</td>
           </tr>
           <tr>
-            <th>医療・健康情報</th>
+            <th>特徴・健康状態</th>
             <td>{animal.medical || "特記事項なし"}</td>
           </tr>
           <tr>
@@ -357,7 +369,7 @@ function AnimalDetail({ animal, isAuthenticated, onEdit, onDelete, onBack }) {
 function AnimalForm({ initialData = null, onSubmit, onCancel }) {
   const isEdit = Boolean(initialData);
   const [form, setForm] = useState({
-    animal_type: initialData?.animal_type ?? "犬",
+    animal_type: initialData?.animal_type ?? "成犬",
     region: initialData?.region ?? "",
     malefemale: initialData?.malefemale ?? "オス",
     age: initialData?.age ?? "",
@@ -464,8 +476,10 @@ function AnimalForm({ initialData = null, onSubmit, onCancel }) {
           value={form.animal_type}
           onChange={updateForm}
         >
-          <option value="犬">犬</option>
-          <option value="猫">猫</option>
+          <option value="成犬">成犬</option>
+          <option value="子犬">子犬</option>
+          <option value="成猫">成猫</option>
+          <option value="子猫">子猫</option>
           <option value="その他">その他</option>
         </select>
       </label>
@@ -504,12 +518,12 @@ function AnimalForm({ initialData = null, onSubmit, onCancel }) {
       </label>
 
       <label>
-        医療・健康情報（任意・255文字以内）
+        特徴・健康状態（任意・255文字以内）
         <textarea
           name="medical"
           value={form.medical}
           onChange={updateForm}
-          placeholder="ワクチン接種状況や持病などを入力してください"
+          placeholder="特徴、ワクチン接種状況・持病などの情報入力欄"
         />
       </label>
 
@@ -720,10 +734,10 @@ export default function App() {
       >
         <section className="page-head">
           <h1>
-            {view === "list" && "保護動物一覧"}
-            {view === "detail" && "保護動物詳細"}
-            {view === "create" && "保護動物 新規登録"}
-            {view === "edit" && "保護動物 編集"}
+            {view === "list" && "🐾 里親募集中！🐾"}
+            {view === "detail" && "🐾 詳細情報 🐾"}
+            {view === "create" && "🐾 新規登録 🐾"}
+            {view === "edit" && "🐾 編　集 🐾"}
             {view === "login" && "利用者ログイン"}
           </h1>
           <p>
