@@ -159,11 +159,11 @@ function LoginPage({ onLoginSuccess, onCancel }) {
   );
 }
 
-// 3. 一覧表示コンポーネント（カード形式＋ページネーション付き）
+// 3. 一覧表示コンポーネント
 function AnimalList({ animals, loading, onSelectAnimal }) {
   const [searchKeyword, setSearchKeyword] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const ITEMS_PER_PAGE = 6; // 1ページに表示するカード枚数（3枚などで試すこともできます）
+  const ITEMS_PER_PAGE = 6; // 1ページに表示するカード枚数
 
   if (loading) {
     return <p className="empty">保護動物データを読み込み中です...</p>;
@@ -349,7 +349,7 @@ function AnimalDetail({ animal, isAuthenticated, onEdit, onDelete, onBack }) {
   );
 }
 
-// 5. 新規登録・編集兼用フォームコンポーネント
+// 5. 新規登録・編集用フォームコンポーネント
 function AnimalForm({ initialData = null, onSubmit, onCancel }) {
   const isEdit = Boolean(initialData);
   const [form, setForm] = useState({
@@ -360,6 +360,7 @@ function AnimalForm({ initialData = null, onSubmit, onCancel }) {
     medical: initialData?.medical ?? "",
     image_url: initialData?.image_url ?? "",
   });
+  const [validationErrors, setValidationErrors] = useState([]);
   const [submitting, setSubmitting] = useState(false);
 
   const updateForm = (event) => {
@@ -371,7 +372,7 @@ function AnimalForm({ initialData = null, onSubmit, onCancel }) {
   };
 
   const handleImageChange = (event) => {
-    const file = event.target.files?.[0];
+    const file = event.target.files && event.target.files[0];
     if (!file) return;
 
     const reader = new FileReader();
@@ -391,16 +392,46 @@ function AnimalForm({ initialData = null, onSubmit, onCancel }) {
     }));
   };
 
+  // 入力項目のバリデーションチェック
+  const validateForm = () => {
+    const errors = [];
+    if (!form.animal_type || !form.animal_type.trim()) {
+      errors.push("動物の種類の入力は必須です。");
+    }
+    if (!form.region || !form.region.trim()) {
+      errors.push("地域の入力は必須です。");
+    } else if (form.region.trim().length > 20) {
+      errors.push("地域は20文字以内で入力してください。");
+    }
+    if (!form.malefemale || !form.malefemale.trim()) {
+      errors.push("性別の選択は必須です。");
+    }
+    if (form.age && form.age.trim().length > 50) {
+      errors.push("年齢は50文字以内で入力してください。");
+    }
+    if (form.medical && form.medical.trim().length > 255) {
+      errors.push("医療・健康情報は255文字以内で入力してください。");
+    }
+    return errors;
+  };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
+
+    const errors = validateForm();
+    if (errors.length > 0) {
+      setValidationErrors(errors);
+      return;
+    }
+    setValidationErrors([]);
     setSubmitting(true);
 
     const payload = {
-      animal_type: form.animal_type,
-      region: form.region,
-      malefemale: form.malefemale,
-      age: form.age === "" ? null : form.age,
-      medical: form.medical === "" ? null : form.medical,
+      animal_type: form.animal_type.trim(),
+      region: form.region.trim(),
+      malefemale: form.malefemale.trim(),
+      age: form.age.trim() === "" ? null : form.age.trim(),
+      medical: form.medical.trim() === "" ? null : form.medical.trim(),
       image_url: form.image_url === "" ? null : form.image_url,
     };
 
@@ -409,7 +440,17 @@ function AnimalForm({ initialData = null, onSubmit, onCancel }) {
   };
 
   return (
-    <form className="form" onSubmit={handleSubmit}>
+    <form className="form" onSubmit={handleSubmit} noValidate>
+      {validationErrors.length > 0 && (
+        <div className="alert">
+          {validationErrors.map((err, index) => (
+            <p key={index} style={{ margin: "4px 0" }}>
+              ・{err}
+            </p>
+          ))}
+        </div>
+      )}
+
       <label>
         <span>
           動物の種類 <span className="required-badge">必須</span>
@@ -418,7 +459,6 @@ function AnimalForm({ initialData = null, onSubmit, onCancel }) {
           name="animal_type"
           value={form.animal_type}
           onChange={updateForm}
-          required
         >
           <option value="犬">犬</option>
           <option value="猫">猫</option>
@@ -428,14 +468,13 @@ function AnimalForm({ initialData = null, onSubmit, onCancel }) {
 
       <label>
         <span>
-          保護地域 <span className="required-badge">必須</span>
+          保護地域（20文字以内） <span className="required-badge">必須</span>
         </span>
         <input
           name="region"
           value={form.region}
           onChange={updateForm}
           placeholder="例：愛媛県西予市"
-          required
         />
       </label>
 
@@ -443,12 +482,7 @@ function AnimalForm({ initialData = null, onSubmit, onCancel }) {
         <span>
           性別 <span className="required-badge">必須</span>
         </span>
-        <select
-          name="malefemale"
-          value={form.malefemale}
-          onChange={updateForm}
-          required
-        >
+        <select name="malefemale" value={form.malefemale} onChange={updateForm}>
           <option value="オス">オス</option>
           <option value="メス">メス</option>
           <option value="不明">不明</option>
@@ -456,7 +490,7 @@ function AnimalForm({ initialData = null, onSubmit, onCancel }) {
       </label>
 
       <label>
-        年齢（任意）
+        年齢（任意・50文字以内）
         <input
           name="age"
           value={form.age}
@@ -466,7 +500,7 @@ function AnimalForm({ initialData = null, onSubmit, onCancel }) {
       </label>
 
       <label>
-        医療・健康情報（任意）
+        医療・健康情報（任意・255文字以内）
         <textarea
           name="medical"
           value={form.medical}
