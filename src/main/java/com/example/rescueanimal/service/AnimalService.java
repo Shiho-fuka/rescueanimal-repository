@@ -11,6 +11,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
+import java.time.LocalDate;
 
 @Service
 public class AnimalService {
@@ -56,6 +57,7 @@ public class AnimalService {
                 request.age(),
                 request.medical(),
                 request.image_url(),
+                LocalDate.now(), // 今日の日付を自動取得
                 owner.getOwner_id()
         );
 
@@ -63,7 +65,7 @@ public class AnimalService {
         return toResponse(savedAnimal);
     }
 
-    // 更新用（owner_idは変更不可のためそのまま維持）
+    // 更新用（posted_date、owner_idは変更不可のためそのまま維持）
     @Transactional
     public AnimalResponse updateAnimal(Integer id, AnimalRequest request) {
         AnimalEntity existingAnimal = animalRepository.findById(id)
@@ -97,6 +99,7 @@ public class AnimalService {
                 animal.getAge(),
                 animal.getMedical(),
                 animal.getImage_url(),
+                animal.getPosted_date(),
                 animal.getOwner_id()
         );
     }

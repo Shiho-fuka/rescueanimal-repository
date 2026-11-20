@@ -8,6 +8,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Lob;
 import jakarta.persistence.Table;
 import lombok.Getter;
+import java.time.LocalDate;
 
 @Getter
 @Entity
@@ -34,6 +35,9 @@ public class AnimalEntity {
     private String image_url;
 
     @Column(nullable = false)
+    private LocalDate posted_date;
+
+    @Column(nullable = false)
     private Integer owner_id;
 
     // 外部から空で作られるのを防ぐためのprotected
@@ -41,13 +45,14 @@ public class AnimalEntity {
     }
 
     // 新規登録用のコンストラクタ
-    public AnimalEntity(String animal_type, String region, String malefemale, String age, String medical, String image_url, Integer owner_id) {
+    public AnimalEntity(String animal_type, String region, String malefemale, String age, String medical, String image_url, LocalDate posted_date, Integer owner_id) {
         this.animal_type = animal_type;
         this.region = region;
         this.malefemale = malefemale;
         this.age = age;
         this.medical = medical;
         this.image_url = image_url;
+        this.posted_date = posted_date;
         this.owner_id = owner_id;
     }
 

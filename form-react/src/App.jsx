@@ -320,6 +320,10 @@ function AnimalDetail({ animal, isAuthenticated, onEdit, onDelete, onBack }) {
             <td>{animal.medical || "特記事項なし"}</td>
           </tr>
           <tr>
+            <th>情報掲載日</th>
+            <td>{animal.posted_date}</td>
+          </tr>
+          <tr>
             <th>登録利用者ID</th>
             <td>{animal.owner_id}</td>
           </tr>

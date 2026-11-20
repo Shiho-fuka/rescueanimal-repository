@@ -6,5 +6,6 @@ CREATE TABLE rescueanimal (
     age VARCHAR(50),
     medical VARCHAR(255),
     image_url CLOB,
+    posted_date DATE NOT NULL,
     owner_id INT NOT NULL
 );
