@@ -160,11 +160,16 @@ function LoginPage({ onLoginSuccess, onCancel }) {
 }
 
 // 3. 一覧表示コンポーネント
-function AnimalList({ animals, loading, onSelectAnimal }) {
+function AnimalList({
+  animals,
+  loading,
+  onSelectAnimal,
+  visibleCount,
+  setVisibleCount,
+  stepCount = 6,
+}) {
   const [inputText, setInputText] = useState("");
   const [searchKeyword, setSearchKeyword] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
-  const ITEMS_PER_PAGE = 6;
 
   if (loading) {
     return <p className="empty">保護動物データを読み込み中です...</p>;
@@ -186,7 +191,7 @@ function AnimalList({ animals, loading, onSelectAnimal }) {
     setInputText(value);
     if (value === "") {
       setSearchKeyword("");
-      setCurrentPage(1);
+      setVisibleCount(stepCount);
     }
   };
 
@@ -194,25 +199,18 @@ function AnimalList({ animals, loading, onSelectAnimal }) {
   const handleSearchSubmit = (event) => {
     event.preventDefault();
     setSearchKeyword(inputText.trim());
-    setCurrentPage(1);
+    setVisibleCount(stepCount);
   };
 
   // クリアボタンを押したときの処理
   const handleClearSearch = () => {
     setInputText("");
     setSearchKeyword("");
-    setCurrentPage(1);
+    setVisibleCount(stepCount);
   };
 
-  const totalPages = Math.max(
-    1,
-    Math.ceil(filteredAnimals.length / ITEMS_PER_PAGE),
-  );
-  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-  const currentAnimals = filteredAnimals.slice(
-    startIndex,
-    startIndex + ITEMS_PER_PAGE,
-  );
+  const currentAnimals = filteredAnimals.slice(0, visibleCount);
+  const remainingCount = filteredAnimals.length - currentAnimals.length;
 
   return (
     <>
@@ -256,6 +254,7 @@ function AnimalList({ animals, loading, onSelectAnimal }) {
                     src={animal.image_url}
                     alt={animal.animal_type}
                     className="animal-card-image"
+                    loading="lazy"
                   />
                 ) : (
                   <div className="animal-card-no-image">写真なし</div>
@@ -286,27 +285,14 @@ function AnimalList({ animals, loading, onSelectAnimal }) {
             ))}
           </section>
 
-          {totalPages > 1 && (
+          {remainingCount > 0 && (
             <div className="pagination">
               <button
                 type="button"
-                disabled={currentPage === 1}
-                onClick={() => setCurrentPage((prev) => prev - 1)}
+                className="button-secondary"
+                onClick={() => setVisibleCount((prev) => prev + stepCount)}
               >
-                ← 前のページ
-              </button>
-
-              <span className="pagination-info">
-                {currentPage} / {totalPages} ページ（全 {filteredAnimals.length}{" "}
-                件）
-              </span>
-
-              <button
-                type="button"
-                disabled={currentPage === totalPages}
-                onClick={() => setCurrentPage((prev) => prev + 1)}
-              >
-                次のページ →
+                もっと見る（残り {remainingCount} 件）
               </button>
             </div>
           )}
@@ -600,6 +586,8 @@ export default function App() {
     owner_id: "",
   });
   const [animals, setAnimals] = useState([]);
+  const [visibleCount, setVisibleCount] = useState(6);
+  const [listScrollY, setListScrollY] = useState(0);
   const [selectedAnimal, setSelectedAnimal] = useState(null);
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
@@ -639,6 +627,12 @@ export default function App() {
     fetchAnimals();
   }, []);
 
+  useEffect(() => {
+    if (view === "list") {
+      window.scrollTo(0, listScrollY);
+    }
+  }, [view, listScrollY]);
+
   // ログイン成功時の処理
   const handleLoginSuccess = async () => {
     await fetchAuthStatus();
@@ -666,6 +660,7 @@ export default function App() {
 
   // 詳細取得
   const handleSelectAnimal = async (id) => {
+    setListScrollY(window.scrollY);
     setErrorMessage("");
     setNoticeMessage("");
     try {
@@ -676,6 +671,7 @@ export default function App() {
       const data = await response.json();
       setSelectedAnimal(data);
       setView("detail");
+      window.scrollTo(0, 0);
     } catch {
       setErrorMessage("詳細データの取得に失敗しました。");
     }
@@ -757,6 +753,9 @@ export default function App() {
   const navigateTo = (nextView) => {
     setErrorMessage("");
     setNoticeMessage("");
+    if (nextView === "list") {
+      setListScrollY(0);
+    }
     setView(nextView);
   };
 
@@ -803,6 +802,9 @@ export default function App() {
             animals={animals}
             loading={loading}
             onSelectAnimal={handleSelectAnimal}
+            visibleCount={visibleCount}
+            setVisibleCount={setVisibleCount}
+            stepCount={6}
           />
         )}
 
@@ -820,7 +822,11 @@ export default function App() {
               setView("edit");
             }}
             onDelete={handleDeleteAnimal}
-            onBack={() => navigateTo("list")}
+            onBack={() => {
+              setErrorMessage("");
+              setNoticeMessage("");
+              setView("list");
+            }}
           />
         )}
 
