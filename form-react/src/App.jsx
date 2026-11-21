@@ -163,47 +163,51 @@ function LoginPage({ onLoginSuccess, onCancel }) {
 function AnimalList({ animals, loading, onSelectAnimal }) {
   const [inputText, setInputText] = useState("");
   const [searchKeyword, setSearchKeyword] = useState("");
-  const [isComposing, setIsComposing] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const ITEMS_PER_PAGE = 6; // 1ページに表示するカード枚数
+  const ITEMS_PER_PAGE = 6;
 
   if (loading) {
-    return <p className="empty">データを読み込み中です...</p>;
+    return <p className="empty">保護動物データを読み込み中です...</p>;
   }
 
   if (animals.length === 0) {
-    return <p className="empty">登録されているデータはまだありません。</p>;
+    return <p className="empty">登録されている保護動物はまだありません。</p>;
   }
 
-  // 種類または地域で絞り込み
   const filteredAnimals = animals.filter(
     (animal) =>
       animal.animal_type.includes(searchKeyword) ||
       animal.region.includes(searchKeyword),
   );
 
-  // 検索ワードが変わったら1ページ目に戻す
-  const handleSearchChange = (event) => {
+  // 入力欄の文字が変わったときの処理
+  const handleInputChange = (event) => {
     const value = event.target.value;
     setInputText(value);
-    if (!isComposing) {
-      setSearchKeyword(value);
+    if (value === "") {
+      setSearchKeyword("");
       setCurrentPage(1);
     }
   };
 
-  const handleCompositionEnd = (event) => {
-    setIsComposing(false);
-    setSearchKeyword(event.target.value);
+  // 検索ボタンまたはEnterキーを押したときに絞り込みを実行
+  const handleSearchSubmit = (event) => {
+    event.preventDefault();
+    setSearchKeyword(inputText.trim());
     setCurrentPage(1);
   };
 
-  // 総ページ数の計算（最低1ページ）
+  // クリアボタンを押したときの処理
+  const handleClearSearch = () => {
+    setInputText("");
+    setSearchKeyword("");
+    setCurrentPage(1);
+  };
+
   const totalPages = Math.max(
     1,
     Math.ceil(filteredAnimals.length / ITEMS_PER_PAGE),
   );
-  // 現在のページに表示するデータだけを切り出す
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
   const currentAnimals = filteredAnimals.slice(
     startIndex,
@@ -212,15 +216,33 @@ function AnimalList({ animals, loading, onSelectAnimal }) {
 
   return (
     <>
-      <div className="animal-search">
+      <form
+        className="animal-search"
+        onSubmit={handleSearchSubmit}
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          gap: "8px",
+          flexWrap: "wrap",
+        }}
+      >
         <input
           value={inputText}
-          onChange={handleSearchChange}
-          onCompositionStart={() => setIsComposing(true)}
-          onCompositionEnd={handleCompositionEnd}
+          onChange={handleInputChange}
           placeholder="動物の種類・地域で検索（例：犬、松山市）"
+          style={{ margin: 0 }}
         />
-      </div>
+        <button type="submit">検索</button>
+        {(inputText || searchKeyword) && (
+          <button
+            type="button"
+            className="button-secondary"
+            onClick={handleClearSearch}
+          >
+            クリア
+          </button>
+        )}
+      </form>
 
       {filteredAnimals.length === 0 ? (
         <p className="empty">検索条件に一致する保護動物はありません。</p>
@@ -240,13 +262,13 @@ function AnimalList({ animals, loading, onSelectAnimal }) {
                 )}
 
                 <h2>
-                  {animal.animal_type} (
+                  {animal.animal_type}（
                   {animal.malefemale === "オス"
                     ? "♂"
                     : animal.malefemale === "メス"
                       ? "♀"
                       : "性別不明"}
-                  )
+                  ）
                 </h2>
                 <p className="animal-card-meta">保護地域：{animal.region}</p>
                 <p className="animal-card-meta">年齢：{animal.age || "不明"}</p>
@@ -264,7 +286,6 @@ function AnimalList({ animals, loading, onSelectAnimal }) {
             ))}
           </section>
 
-          {/* ページが2ページ以上ある場合、または件数確認用にページ切り替えを表示 */}
           {totalPages > 1 && (
             <div className="pagination">
               <button
