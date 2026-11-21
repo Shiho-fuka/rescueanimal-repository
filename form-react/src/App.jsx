@@ -161,7 +161,9 @@ function LoginPage({ onLoginSuccess, onCancel }) {
 
 // 3. 一覧表示コンポーネント
 function AnimalList({ animals, loading, onSelectAnimal }) {
+  const [inputText, setInputText] = useState("");
   const [searchKeyword, setSearchKeyword] = useState("");
+  const [isComposing, setIsComposing] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const ITEMS_PER_PAGE = 6; // 1ページに表示するカード枚数
 
@@ -182,6 +184,16 @@ function AnimalList({ animals, loading, onSelectAnimal }) {
 
   // 検索ワードが変わったら1ページ目に戻す
   const handleSearchChange = (event) => {
+    const value = event.target.value;
+    setInputText(value);
+    if (!isComposing) {
+      setSearchKeyword(value);
+      setCurrentPage(1);
+    }
+  };
+
+  const handleCompositionEnd = (event) => {
+    setIsComposing(false);
     setSearchKeyword(event.target.value);
     setCurrentPage(1);
   };
@@ -202,8 +214,10 @@ function AnimalList({ animals, loading, onSelectAnimal }) {
     <>
       <div className="animal-search">
         <input
-          value={searchKeyword}
+          value={inputText}
           onChange={handleSearchChange}
+          onCompositionStart={() => setIsComposing(true)}
+          onCompositionEnd={handleCompositionEnd}
           placeholder="動物の種類・地域で検索（例：犬、松山市）"
         />
       </div>
